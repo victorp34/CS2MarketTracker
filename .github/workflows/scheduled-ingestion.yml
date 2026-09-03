@@ -1,0 +1,29 @@
+name: Ingestion quotidienne des prix
+
+on:
+  schedule:
+    # Horaires en UTC (GitHub Actions ne connaît pas les fuseaux horaires locaux)
+    - cron: '0 3 * * *'  # catalogue complet
+    - cron: '0 4 * * *'  # historique détaillé + vérification des alertes
+  workflow_dispatch: {} # permet aussi de déclencher manuellement depuis l'onglet Actions
+
+jobs:
+  run-catalog:
+    if: github.event.schedule == '0 3 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déclenche l'ingestion du catalogue complet
+        run: |
+          curl -f --max-time 300 -X POST \
+            -H "x-admin-secret: ${{ secrets.ADMIN_SECRET }}" \
+            "${{ secrets.RENDER_BACKEND_URL }}/api/admin/run-catalog"
+
+  run-detailed:
+    if: github.event.schedule == '0 4 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déclenche l'historique détaillé et la vérification des alertes
+        run: |
+          curl -f --max-time 300 -X POST \
+            -H "x-admin-secret: ${{ secrets.ADMIN_SECRET }}" \
+            "${{ secrets.RENDER_BACKEND_URL }}/api/admin/run-detailed"

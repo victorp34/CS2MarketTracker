@@ -1,0 +1,35 @@
+# Environnement / secrets
+.env
+.env.local
+
+# Dépendances
+node_modules/
+frontend/node_modules/
+
+# Build frontend
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Fichiers générés par les scripts de test d'API (contiennent des données brutes,
+# pas de secrets, mais inutiles à versionner)
+skinport-sample.json
+skinport-history-sample.json
+csgo-api-sample.json
+stickers-sample.json
+patches-sample.json
+agents-sample.json
+music_kits-sample.json
+graffiti-sample.json
+keychains-sample.json
+
+# Éditeurs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker (volumes locaux, si jamais montés en bind plutôt qu'en volume nommé)
+pgdata/

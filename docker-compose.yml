@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cs2-market-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-cs2user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cs2password}
+      POSTGRES_DB: ${DB_NAME:-cs2_market}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cs2user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Adminer : outil d'administration de la base, PRATIQUE EN DEV UNIQUEMENT.
+  # Le profil "dev" fait qu'il ne démarre JAMAIS avec un simple
+  # `docker compose up` (donc jamais en prod par erreur) — il faut explicitement
+  # `docker compose --profile dev up -d` pour l'inclure.
+  adminer:
+    image: adminer
+    container_name: cs2-market-adminer
+    restart: unless-stopped
+    profiles: ["dev"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cs2-market-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-cs2user}:${DB_PASSWORD:-cs2password}@postgres:5432/${DB_NAME:-cs2_market}
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cs2-market-scheduler
+    restart: unless-stopped
+    command: node scheduler.js
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-cs2user}:${DB_PASSWORD:-cs2password}@postgres:5432/${DB_NAME:-cs2_market}
+      JWT_SECRET: ${JWT_SECRET}
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    container_name: cs2-market-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
