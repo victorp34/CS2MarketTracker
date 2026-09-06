@@ -25,7 +25,7 @@ function getTransporter() {
   return transporter;
 }
 
-async function sendEmailAlert({ toEmail, marketHashName, targetPrice, direction, currentPrice }) {
+async function sendEmailAlert({ toEmail, marketHashName, targetPrice, direction, currentPrice, itemPage }) {
   const t = getTransporter();
 
   if (!t) {
@@ -34,17 +34,20 @@ async function sendEmailAlert({ toEmail, marketHashName, targetPrice, direction,
   }
 
   const directionText = direction === 'below' ? 'est passé sous' : 'a dépassé';
+  const linkHtml = itemPage ? `<p><a href="${itemPage}">Voir l'offre la moins chère sur Skinport</a></p>` : '';
+  const linkText = itemPage ? `\nVoir l'offre : ${itemPage}` : '';
 
   try {
     await t.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: toEmail,
       subject: `Alerte prix : ${marketHashName}`,
-      text: `${marketHashName} ${directionText} ${targetPrice}€. Prix actuel (moyenne 24h) : ${currentPrice.toFixed(2)}€.`,
+      text: `${marketHashName} ${directionText} ${targetPrice}€. Prix actuel : ${currentPrice.toFixed(2)}€.${linkText}`,
       html: `
         <h2>Alerte de prix déclenchée</h2>
         <p><strong>${marketHashName}</strong> ${directionText} <strong>${targetPrice}€</strong></p>
-        <p>Prix actuel (moyenne 24h) : <strong>${currentPrice.toFixed(2)}€</strong></p>
+        <p>Prix actuel : <strong>${currentPrice.toFixed(2)}€</strong></p>
+        ${linkHtml}
       `
     });
   } catch (err) {

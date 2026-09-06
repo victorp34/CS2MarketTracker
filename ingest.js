@@ -37,7 +37,7 @@ async function run() {
   // dans /v1/sales/history (URL trop longue, rate limit explosé) — seulement les
   // skins réellement suivis via au moins une alerte.
   const { rows: skins } = await pool.query(
-    `SELECT DISTINCT s.id, s.market_hash_name
+    `SELECT DISTINCT s.id, s.market_hash_name, s.item_page
      FROM skins s
      JOIN alerts a ON a.skin_id = s.id`
   );
@@ -50,6 +50,7 @@ async function run() {
   console.log(`${skins.length} skin(s) suivi(s), appel de l'API Skinport...`);
 
   const skinByName = new Map(skins.map(s => [s.market_hash_name, s.id]));
+  const itemPageBySkinId = new Map(skins.map(s => [s.id, s.item_page]));
   const names = skins.map(s => s.market_hash_name);
   const results = await fetchSalesHistory(names);
 
@@ -103,7 +104,7 @@ async function run() {
       console.warn(`Pas de prix catalogue (price_daily) pour ${item.market_hash_name}, alertes ignorées pour ce cycle.`);
       continue;
     }
-    await checkAlertsForSkin(skinId, item.market_hash_name, currentMinPrice !== null ? Number(currentMinPrice) : null);
+    await checkAlertsForSkin(skinId, item.market_hash_name, currentMinPrice !== null ? Number(currentMinPrice) : null, itemPageBySkinId.get(skinId));
   }
 
   console.log(`Terminé : ${inserted} skin(s) avec ventes, ${skipped} sans vente sur 24h.`);

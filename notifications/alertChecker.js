@@ -2,11 +2,11 @@ const pool = require('../db');
 const sendDiscordAlert = require('./discord');
 const sendEmailAlert = require('./email');
 
-// Vérifie les alertes actives pour un skin donné, par rapport au prix moyen du jour.
+// Vérifie les alertes actives pour un skin donné, par rapport au prix actuel.
 // Si le seuil est franchi : envoie les notifications (Discord + email) et désactive l'alerte.
-async function checkAlertsForSkin(skinId, marketHashName, currentPrice) {
+async function checkAlertsForSkin(skinId, marketHashName, currentPrice, itemPage) {
   if (currentPrice === null || currentPrice === undefined) {
-    return; // pas de vente aujourd'hui, rien à comparer
+    return; // pas de prix disponible, rien à comparer
   }
 
   const { rows: alerts } = await pool.query(
@@ -28,8 +28,8 @@ async function checkAlertsForSkin(skinId, marketHashName, currentPrice) {
     console.log(`Alerte déclenchée : ${marketHashName} ${alert.direction} ${targetPrice}€ (actuel: ${currentPrice}€)`);
 
     await Promise.all([
-      sendDiscordAlert({ marketHashName, targetPrice, direction: alert.direction, currentPrice }),
-      sendEmailAlert({ toEmail: alert.email, marketHashName, targetPrice, direction: alert.direction, currentPrice })
+      sendDiscordAlert({ marketHashName, targetPrice, direction: alert.direction, currentPrice, itemPage }),
+      sendEmailAlert({ toEmail: alert.email, marketHashName, targetPrice, direction: alert.direction, currentPrice, itemPage })
     ]);
 
     // Désactive l'alerte et marque le déclenchement comme "non vu"
