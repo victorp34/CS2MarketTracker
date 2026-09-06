@@ -1,8 +1,11 @@
 // Script d'ingestion quotidien :
-// 1. Lit les skins suivis dans la table `skins`
-// 2. Appelle /v1/sales/history en batchant leurs market_hash_name
+// 1. Lit les skins suivis dans la table `skins` (uniquement ceux ayant une alerte)
+// 2. Appelle /v1/sales/history en batchant leurs market_hash_name (pour price_history,
+//    conservé pour référence/statistiques, mais plus utilisé pour déclencher les alertes)
 // 3. Insère un point du jour dans price_history (pas de doublon si relancé)
-// 4. Vérifie les alertes actives pour chaque skin et notifie si le seuil est franchi
+// 4. Vérifie les alertes actives en comparant au PRIX MINIMUM ACTUEL (price_daily,
+//    alimenté par ingest-catalog.js) plutôt qu'au prix moyen des ventes passées --
+//    plus intuitif : "préviens-moi si je peux l'acheter sous X€ maintenant"
 //
 // Usage : node ingest.js
 
@@ -52,6 +55,18 @@ async function run() {
 
   const today = new Date().toISOString().slice(0, 10);
 
+  // Prix minimum actuel de chaque skin suivi, tel qu'enregistré par la dernière
+  // ingestion du catalogue (price_daily) -- sert de référence pour les alertes.
+  const skinIds = skins.map(s => s.id);
+  const { rows: latestPrices } = await pool.query(
+    `SELECT DISTINCT ON (skin_id) skin_id, min_price
+     FROM price_daily
+     WHERE skin_id = ANY($1)
+     ORDER BY skin_id, recorded_date DESC`,
+    [skinIds]
+  );
+  const minPriceBySkinId = new Map(latestPrices.map(r => [r.skin_id, r.min_price]));
+
   let inserted = 0;
   let skipped = 0;
 
@@ -81,8 +96,14 @@ async function run() {
       inserted++;
     }
 
-    // Vérifie les alertes actives sur ce skin par rapport au prix moyen du jour
-    await checkAlertsForSkin(skinId, item.market_hash_name, stats24h.avg);
+    // Vérifie les alertes actives sur ce skin par rapport au prix minimum ACTUEL
+    // (price_daily), pas la moyenne des ventes passées (price_history).
+    const currentMinPrice = minPriceBySkinId.get(skinId);
+    if (currentMinPrice === undefined) {
+      console.warn(`Pas de prix catalogue (price_daily) pour ${item.market_hash_name}, alertes ignorées pour ce cycle.`);
+      continue;
+    }
+    await checkAlertsForSkin(skinId, item.market_hash_name, currentMinPrice !== null ? Number(currentMinPrice) : null);
   }
 
   console.log(`Terminé : ${inserted} skin(s) avec ventes, ${skipped} sans vente sur 24h.`);
