@@ -1,12 +1,13 @@
 const STACK = [
   { category: 'Frontend', items: 'React 18 (Vite), Tailwind CSS, Recharts, React Router' },
   { category: 'Backend', items: 'Node.js / Express' },
-  { category: 'Base de données', items: 'PostgreSQL 16' },
+  { category: 'Base de données', items: 'PostgreSQL (Neon en production)' },
   { category: 'Auth', items: 'JWT, bcrypt' },
-  { category: 'Récupération des prix', items: 'node-cron : interroge l\'API Skinport chaque jour, nettoie et enregistre les prix en base' },
+  { category: 'Récupération des prix', items: 'Scripts planifiés qui interrogent l\'API Skinport, nettoient et enregistrent les prix en base' },
   { category: 'Notifications', items: 'Webhook Discord, SMTP' },
   { category: 'Tests', items: 'node:test + supertest' },
-  { category: 'Infra', items: 'Docker / Docker Compose (5 services), Nginx' }
+  { category: 'Infra (dev)', items: 'Docker / Docker Compose (5 services), Nginx' },
+  { category: 'Infra (prod)', items: 'Render (backend + frontend), Neon (base de données), GitHub Actions (planification)' }
 ];
 
 const CHALLENGES = [
@@ -31,16 +32,23 @@ const CHALLENGES = [
     solution: 'Déduplication en mémoire avant l\'insertion, sur la clé identifiant.'
   },
   {
-    title: 'Une métrique de prix trompeuse',
+    title: 'Une métrique de prix trompeuse (deux itérations)',
     problem:
-      "Le prix minimum d'un item peut être faussé par une seule annonce isolée très en dessous du marché, un skin passant de 100€ à 2€ puis revenant à 100€ ne représente aucune vraie tendance.",
+      "Le prix minimum d'un item peut être faussé par une seule annonce isolée très en dessous du marché — un skin passant de 100€ à 2€ puis revenant à 100€ ne représente aucune vraie tendance. Premier correctif : utiliser le prix médian plutôt que le minimum. Mais un second cas est apparu sur des objets très bon marché (un sticker passant de 0,11€ à 0,50€ affichait +354%, un chiffre réel mais sans aucune portée économique).",
     solution:
-      'Les calculs de variation utilisent le prix médian plutôt que le minimum, avec un seuil de liquidité minimal (10 offres) exigé aux deux instantanés comparés pour écarter les marchés trop peu profonds.'
+      "Le calcul final combine un plancher de liquidité (au moins 10 offres actives aux deux instants comparés) et un plancher de prix absolu (1€ minimum des deux côtés), sur le prix minimum plutôt que la médiane — cette dernière n'était en fait pas le vrai problème, tous les prix bas souffrent du même effet de pourcentage disproportionné."
+  },
+  {
+    title: 'Quel prix utiliser pour déclencher une alerte ?',
+    problem:
+      "Première version : comparer le seuil au prix moyen des ventes réelles des dernières 24h. Problème découvert à l'usage : une alerte doit répondre à \"puis-je l'acheter sous X€ maintenant ?\", pas \"le marché a-t-il vendu en moyenne sous X€ hier ?\" — deux questions différentes.",
+    solution:
+      "Les alertes comparent maintenant le seuil au prix minimum actuellement affiché en vente. Une seule annonce isolée à bas prix déclenche bien l'alerte — c'est le comportement voulu ici (contrairement au classement des variations) : une opportunité d'achat réelle, même ponctuelle, mérite d'être signalée."
   },
   {
     title: 'Recherche floue sur des noms structurés',
     problem:
-      "Une recherche par sous-chaîne exacte échoue sur des requêtes multi-mots dès que le nom réel contient une ponctuation entre les mots (ex. \"AK-47 | Redline\"), chercher \"AK-47 Redline\" ne matchait rien.",
+      "Une recherche par sous-chaîne exacte échoue sur des requêtes multi-mots dès que le nom réel contient une ponctuation entre les mots (ex. \"AK-47 | Redline\") — chercher \"AK-47 Redline\" ne matchait rien.",
     solution:
       "Chaque mot de la recherche est vérifié indépendamment (tous doivent apparaître, peu importe l'ordre ou les séparateurs), puis les résultats sont classés par similarité via l'extension pg_trgm de Postgres."
   },
@@ -60,7 +68,8 @@ const SECURITY = [
   'Mots de passe hashés avec bcrypt',
   'Requêtes SQL systématiquement paramétrées',
   'Conteneurs applicatifs exécutés en utilisateur non-root',
-  'Outil d\'administration de la base isolé derrière un profil Docker dédié au développement, jamais actif en production'
+  'Outil d\'administration de la base isolé derrière un profil Docker dédié au développement, jamais actif en production',
+  'Routes de déclenchement d\'ingestion (utilisées en production) protégées par un secret dédié, comparé de façon résistante aux attaques par mesure de temps'
 ];
 
 export default function About() {
@@ -68,7 +77,7 @@ export default function About() {
     <div className="max-w-3xl">
       <h1 className="font-display font-bold text-3xl mb-2">À propos de ce projet</h1>
       <p className="text-muted mb-10">
-        C'est un tracker de prix et un système d'alertes pour l'ensemble du catalogue de skins CS2, construit comme
+        Un tracker de prix et un système d'alertes pour l'ensemble du catalogue de skins CS2, construit comme
         projet de portfolio. Cette page détaille les choix techniques, les contraintes rencontrées et comment
         elles ont été traitées.
       </p>
@@ -91,13 +100,15 @@ export default function About() {
       <section className="mb-10">
         <h2 className="font-display font-semibold text-xl mb-4">Architecture des données</h2>
         <p className="text-sm text-muted mb-3">
-          Tous les skins n'ont pas le même niveau de détail enregistré. Pour les ~25 000 skins du catalogue, on
-          garde juste l'essentiel chaque jour. Pour les quelques skins
-          qu'un utilisateur surveille via une alerte, on garde un historique bien plus complet.
+          Le prix affiché sur le graphique et utilisé pour les alertes (prix minimum, quantité d'offres) est
+          calculé de la même façon pour tous les ~25 000 skins du catalogue, suivis ou non — une seule requête
+          quotidienne à l'API suffit à couvrir l'ensemble.
         </p>
         <p className="text-sm text-muted">
-          Cette différence vient d'une contrainte de l'API Skinport : le nombre de requêtes détaillées possibles
-          est limité, impossible d'avoir le dossier complet pour 25 000 items à la fois.
+          Une donnée plus détaillée (moyenne des ventes réelles, volume de ventes) reste calculée séparément pour
+          les skins ayant une alerte, à cause d'une limite de l'API (impossible de la demander pour 25 000 items
+          à la fois). Elle n'est pas exploitée dans l'interface actuellement — un choix d'architecture posé pour
+          une évolution future plutôt qu'un besoin immédiat.
         </p>
       </section>
 
@@ -132,12 +143,12 @@ export default function About() {
         </ul>
       </section>
 
-      <section className="mb-4">
-        <h2 className="font-display font-semibold text-xl mb-4">Containerisation & déploiement</h2>
+      <section className="mb-10">
+        <h2 className="font-display font-semibold text-xl mb-4">Containerisation (développement)</h2>
         <p className="text-sm text-muted mb-3">
-          L'application tourne sur 5 services Docker orchestrés par Docker Compose : base de données PostgreSQL,
-          backend Express, worker de planification (cron) pour les ingestions automatiques, frontend buildé et
-          servi par Nginx, et un outil d'administration de base réservé au développement.
+          En local, l'application tourne sur 5 services Docker orchestrés par Docker Compose : base de données
+          PostgreSQL, backend Express, worker de planification (cron) pour les ingestions automatiques, frontend
+          buildé et servi par Nginx, et un outil d'administration de base réservé au développement.
         </p>
         <p className="text-sm text-muted mb-3">
           Le frontend est buildé en deux étapes (compilation Vite puis image Nginx finale légère), avec une
@@ -146,9 +157,44 @@ export default function About() {
         </p>
         <p className="text-sm text-muted">
           Le schéma de base de données est entièrement scripté dans un fichier d'initialisation unique, exécuté
-          automatiquement à la création du volume, aucune étape manuelle n'est nécessaire pour démarrer l'environnement
+          automatiquement à la création du volume — aucune étape manuelle nécessaire pour démarrer l'environnement
           depuis zéro.
         </p>
+      </section>
+
+      <section className="mb-4">
+        <h2 className="font-display font-semibold text-xl mb-4">Mise en production</h2>
+        <p className="text-sm text-muted mb-3">
+          L'hébergement en continu de 5 services Docker a un coût mensuel réel sur la plupart des plateformes
+          actuelles. Pour un projet de portfolio, l'architecture de production a été repensée pour rester
+          entièrement gratuite, quitte à accepter un compromis assumé.
+        </p>
+        <div className="grid gap-3 mb-3">
+          <div className="rarity-card">
+            <span className="font-display font-semibold block mb-1">Base de données</span>
+            <p className="text-sm text-muted">
+              PostgreSQL hébergé chez Neon, dont le tier gratuit est permanent (contrairement à celui de la
+              plupart des hébergeurs classiques, limité dans le temps).
+            </p>
+          </div>
+          <div className="rarity-card">
+            <span className="font-display font-semibold block mb-1">Backend et frontend</span>
+            <p className="text-sm text-muted">
+              Backend en Web Service gratuit sur Render (se met en veille après 15 minutes d'inactivité — premier
+              chargement plus lent après une pause, compromis accepté pour une démo), frontend en site statique
+              gratuit sur la même plateforme.
+            </p>
+          </div>
+          <div className="rarity-card">
+            <span className="font-display font-semibold block mb-1">Planification sans service payant</span>
+            <p className="text-sm text-muted">
+              Un service "toujours actif" dédié à la planification (comme en développement) implique un coût
+              fixe. À la place, deux routes protégées par un secret déclenchent les ingestions à distance,
+              appelées chaque jour par un workflow GitHub Actions planifié — gratuit, sans service supplémentaire
+              à faire tourner en continu.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   );
