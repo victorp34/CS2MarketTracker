@@ -10,6 +10,11 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Render (comme la plupart des hébergeurs) place l'app derrière un proxy inverse.
+// Sans ça, express-rate-limit ne peut pas identifier correctement l'IP de chaque
+// visiteur (il verrait l'IP interne du proxy pour tout le monde).
+app.set('trust proxy', 1);
+
 // En dev, autorise le frontend local par défaut. En prod, FRONTEND_URL doit
 // pointer vers l'URL réelle du frontend déployé (définie en variable d'env).
 const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';

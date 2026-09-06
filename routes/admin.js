@@ -3,6 +3,7 @@ const crypto = require('crypto');
 
 const runCatalogIngestion = require('../ingest-catalog');
 const runDetailedIngestion = require('../ingest');
+const runImagesIngestion = require('../ingest-images');
 
 const router = express.Router();
 
@@ -47,6 +48,17 @@ router.post('/run-detailed', async (req, res) => {
   } catch (err) {
     console.error('Erreur ingestion détaillée (déclenchée à distance) :', err);
     res.status(500).json({ error: 'Échec de l\'ingestion détaillée.' });
+  }
+});
+
+// POST /api/admin/run-images - association des images (dataset externe, rarement nécessaire)
+router.post('/run-images', async (req, res) => {
+  try {
+    await runImagesIngestion();
+    res.json({ status: 'ok', ran: 'images', at: new Date().toISOString() });
+  } catch (err) {
+    console.error('Erreur ingestion images (déclenchée à distance) :', err);
+    res.status(500).json({ error: 'Échec de l\'ingestion des images.' });
   }
 });
 
