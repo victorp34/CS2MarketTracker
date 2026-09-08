@@ -1,0 +1,23 @@
+name: Ingestion — Catalogue complet
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  run-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déclenche l'ingestion du catalogue complet
+        run: |
+          http_code=$(curl -sS -o response.txt -w "%{http_code}" --max-time 300 -X POST \
+            -H "x-admin-secret: ${{ secrets.ADMIN_SECRET }}" \
+            "${{ secrets.RENDER_BACKEND_URL }}/api/admin/run-catalog")
+          echo "Statut HTTP : $http_code"
+          echo "Réponse du serveur :"
+          cat response.txt
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "Échec : statut HTTP $http_code"
+            exit 1
+          fi
