@@ -11,6 +11,7 @@
 
 const pool = require('./db');
 const checkAlertsForSkin = require('./notifications/alertChecker');
+const fetchWithRetry = require('./fetchWithRetry');
 
 async function fetchSalesHistory(marketHashNames) {
   const params = new URLSearchParams({
@@ -19,23 +20,15 @@ async function fetchSalesHistory(marketHashNames) {
     market_hash_name: marketHashNames.join(',')
   });
 
-  const response = await fetch(`https://api.skinport.com/v1/sales/history?${params}`, {
+  const response = await fetchWithRetry(`https://api.skinport.com/v1/sales/history?${params}`, {
     method: 'GET',
     headers: { 'Accept-Encoding': 'br' }
   });
-
-  if (!response.ok) {
-    throw new Error(`Skinport API a renvoyé le statut ${response.status}`);
-  }
 
   return response.json();
 }
 
 async function run() {
-  // Important : depuis l'ajout du catalogue complet (ingest-catalog.js), la table
-  // `skins` contient TOUS les items Skinport (~300k). On ne veut PAS batcher tout ça
-  // dans /v1/sales/history (URL trop longue, rate limit explosé) — seulement les
-  // skins réellement suivis via au moins une alerte.
   const { rows: skins } = await pool.query(
     `SELECT DISTINCT s.id, s.market_hash_name, s.item_page
      FROM skins s
@@ -56,8 +49,6 @@ async function run() {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Prix minimum actuel de chaque skin suivi, tel qu'enregistré par la dernière
-  // ingestion du catalogue (price_daily) -- sert de référence pour les alertes.
   const skinIds = skins.map(s => s.id);
   const { rows: latestPrices } = await pool.query(
     `SELECT DISTINCT ON (skin_id) skin_id, min_price
@@ -97,8 +88,6 @@ async function run() {
       inserted++;
     }
 
-    // Vérifie les alertes actives sur ce skin par rapport au prix minimum ACTUEL
-    // (price_daily), pas la moyenne des ventes passées (price_history).
     const currentMinPrice = minPriceBySkinId.get(skinId);
     if (currentMinPrice === undefined) {
       console.warn(`Pas de prix catalogue (price_daily) pour ${item.market_hash_name}, alertes ignorées pour ce cycle.`);

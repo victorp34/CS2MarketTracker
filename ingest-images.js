@@ -1,38 +1,27 @@
 // Récupère les URLs d'images depuis le dataset communautaire ByMykel/CSGO-API
 // et les associe à nos skins. Deux stratégies de correspondance :
+// 1. Match EXACT via market_hash_name (stickers, patches, agents, music kits, graffiti, breloques)
+// 2. Match APPROXIMATIF via nom normalisé (skins.json, armes/couteaux/gants)
 //
-// 1. Match EXACT via market_hash_name (stickers, patches, agents, music kits,
-//    graffiti, breloques) — le dataset fournit directement le même identifiant
-//    que Skinport pour ces catégories, donc correspondance fiable à 100%.
-// 2. Match APPROXIMATIF via nom normalisé (skins.json) — ce fichier ne couvre
-//    que les skins d'armes/couteaux/gants, et ne donne pas le market_hash_name
-//    (pas de StatTrak/usure dans son "name"), d'où la normalisation.
-//
-// À exécuter occasionnellement (le dataset change peu) : node ingest-images.js
+// Usage : node ingest-images.js
 
 const pool = require('./db');
+const fetchWithRetry = require('./fetchWithRetry');
 
 const BASE_URL = 'https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en';
-
-// Fichiers avec market_hash_name direct -> match exact
 const EXACT_MATCH_FILES = ['stickers', 'patches', 'agents', 'music_kits', 'graffiti', 'keychains'];
-
-// Fichier sans market_hash_name -> nécessite une normalisation du nom Skinport
 const SKINS_FILE = 'skins';
 
 function normalizeForMatch(marketHashName) {
   return marketHashName
     .replace(/StatTrak™\s*/, '')
     .replace(/Souvenir\s*/, '')
-    .replace(/\s*\([^)]*\)\s*$/, '') // retire le "(Field-Tested)" final
+    .replace(/\s*\([^)]*\)\s*$/, '')
     .trim();
 }
 
 async function fetchJson(filename) {
-  const response = await fetch(`${BASE_URL}/${filename}.json`);
-  if (!response.ok) {
-    throw new Error(`Échec du téléchargement de ${filename}.json : statut ${response.status}`);
-  }
+  const response = await fetchWithRetry(`${BASE_URL}/${filename}.json`);
   return response.json();
 }
 

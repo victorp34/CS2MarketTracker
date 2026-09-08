@@ -1,4 +1,4 @@
-// Récupère TOUT le catalogue Skinport (~300k lignes) en un seul appel API,
+// Récupère TOUT le catalogue Skinport (~25k lignes) en un seul appel API,
 // et stocke un point léger par item par jour (min_price, median_price, quantity).
 // Sert la recherche + les graphiques de n'importe quel skin, même jamais suivi.
 //
@@ -6,20 +6,17 @@
 
 const pool = require('./db');
 const bulkInsert = require('./bulkInsert');
+const fetchWithRetry = require('./fetchWithRetry');
 
 const RETENTION_DAYS = 90;
 
 async function fetchFullCatalog() {
   const params = new URLSearchParams({ app_id: 730, currency: 'EUR' });
 
-  const response = await fetch(`https://api.skinport.com/v1/items?${params}`, {
+  const response = await fetchWithRetry(`https://api.skinport.com/v1/items?${params}`, {
     method: 'GET',
     headers: { 'Accept-Encoding': 'br' }
   });
-
-  if (!response.ok) {
-    throw new Error(`Skinport API a renvoyé le statut ${response.status}`);
-  }
 
   return response.json();
 }
@@ -29,17 +26,13 @@ async function run() {
   const rawItems = await fetchFullCatalog();
   console.log(`${rawItems.length} items reçus.`);
 
-  // L'API renvoie parfois plusieurs entrées avec le même market_hash_name
-  // (variantes de listing). ON CONFLICT DO UPDATE ne supporte pas de traiter
-  // la même clé deux fois dans un même lot -> on déduplique en amont.
   const itemByName = new Map();
   for (const item of rawItems) {
-    itemByName.set(item.market_hash_name, item); // garde la dernière occurrence
+    itemByName.set(item.market_hash_name, item);
   }
   const items = Array.from(itemByName.values());
   console.log(`${items.length} items uniques après déduplication.`);
 
-  // 1. Upsert en masse de tous les items dans `skins` (table d'identité partagée)
   console.log('Upsert des skins en base (par lots)...');
   const skinRows = await bulkInsert(pool, {
     table: 'skins',
@@ -57,10 +50,6 @@ async function run() {
   const idByName = new Map(skinRows.map(r => [r.market_hash_name, r.id]));
   console.log(`${idByName.size} skin(s) upsertés.`);
 
-  // 2. Insertion en masse du point de prix du jour pour tous les items
-  //    (min_price ET median_price : le prix min est fragile à une annonce
-  //    isolée à bas prix, la médiane sert de référence plus robuste pour
-  //    les calculs de variation, ex. top hausses/baisses)
   const today = new Date().toISOString().slice(0, 10);
   const priceDailyRows = items
     .map(i => ({
@@ -70,7 +59,7 @@ async function run() {
       median_price: i.median_price ?? null,
       quantity: i.quantity ?? null
     }))
-    .filter(r => r.skin_id); // sécurité si un nom n'a pas matché
+    .filter(r => r.skin_id);
 
   console.log('Insertion des prix du jour (par lots)...');
   await bulkInsert(pool, {
@@ -81,7 +70,6 @@ async function run() {
     conflictAction: 'DO UPDATE SET min_price = EXCLUDED.min_price, median_price = EXCLUDED.median_price, quantity = EXCLUDED.quantity'
   });
 
-  // 3. Purge des données de plus de 90 jours (les deux tables d'historique)
   console.log(`Purge des données de plus de ${RETENTION_DAYS} jours...`);
   const { rowCount: purgedDaily } = await pool.query(
     `DELETE FROM price_daily WHERE recorded_date < CURRENT_DATE - INTERVAL '${RETENTION_DAYS} days'`
