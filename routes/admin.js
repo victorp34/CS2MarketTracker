@@ -7,9 +7,6 @@ const runImagesIngestion = require('../ingest-images');
 
 const router = express.Router();
 
-// Comparaison résistante aux attaques par mesure de temps ("timing attack") :
-// évite qu'un attaquant devine le secret caractère par caractère en mesurant
-// la vitesse de réponse du serveur.
 function isValidSecret(provided) {
   const expected = process.env.ADMIN_SECRET;
   if (!expected || !provided) return false;
@@ -36,7 +33,9 @@ router.post('/run-catalog', async (req, res) => {
     res.json({ status: 'ok', ran: 'catalog', at: new Date().toISOString() });
   } catch (err) {
     console.error('Erreur ingestion catalogue (déclenchée à distance) :', err);
-    res.status(500).json({ error: 'Échec de l\'ingestion du catalogue.' });
+    // Cette route est déjà protégée par un secret, donc pas de risque à renvoyer
+    // le vrai message d'erreur -- ça évite d'avoir à croiser les logs Render à chaque fois.
+    res.status(500).json({ error: 'Échec de l\'ingestion du catalogue.', detail: err.message });
   }
 });
 
@@ -47,7 +46,7 @@ router.post('/run-detailed', async (req, res) => {
     res.json({ status: 'ok', ran: 'detailed', at: new Date().toISOString() });
   } catch (err) {
     console.error('Erreur ingestion détaillée (déclenchée à distance) :', err);
-    res.status(500).json({ error: 'Échec de l\'ingestion détaillée.' });
+    res.status(500).json({ error: 'Échec de l\'ingestion détaillée.', detail: err.message });
   }
 });
 
@@ -58,7 +57,7 @@ router.post('/run-images', async (req, res) => {
     res.json({ status: 'ok', ran: 'images', at: new Date().toISOString() });
   } catch (err) {
     console.error('Erreur ingestion images (déclenchée à distance) :', err);
-    res.status(500).json({ error: 'Échec de l\'ingestion des images.' });
+    res.status(500).json({ error: 'Échec de l\'ingestion des images.', detail: err.message });
   }
 });
 
