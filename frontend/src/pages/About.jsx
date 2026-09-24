@@ -32,7 +32,7 @@ const CHALLENGES = [
     solution: 'Déduplication en mémoire avant l\'insertion, sur la clé identifiant.'
   },
   {
-    title: 'Une métrique de prix trompeuse (deux itérations)',
+    title: 'Une métrique de prix trompeuse (trois itérations)',
     problem:
       "Le prix minimum d'un item peut être faussé par une seule annonce isolée très en dessous du marché — un skin passant de 100€ à 2€ puis revenant à 100€ ne représente aucune vraie tendance. Premier correctif : utiliser le prix médian plutôt que le minimum. Mais un second cas est apparu sur des objets très bon marché (un sticker passant de 0,11€ à 0,50€ affichait +354%, un chiffre réel mais sans aucune portée économique).",
     solution:
@@ -50,13 +50,34 @@ const CHALLENGES = [
     problem:
       "Une recherche par sous-chaîne exacte échoue sur des requêtes multi-mots dès que le nom réel contient une ponctuation entre les mots (ex. \"AK-47 | Redline\") — chercher \"AK-47 Redline\" ne matchait rien.",
     solution:
-      "Chaque mot de la recherche est vérifié indépendamment (tous doivent apparaître, peu importe l'ordre ou les séparateurs), puis les résultats sont classés par similarité via l'extension pg_trgm de Postgres."
+      "Chaque mot de la recherche est vérifié indépendamment (tous doivent apparaître, peu importe l'ordre ou les séparateurs). Les résultats sont ensuite classés par famille : pertinence calculée sur le nom de base via l'extension pg_trgm de Postgres, puis variantes (normale, StatTrak™, Souvenir) et usures dans l'ordre du jeu, de Factory New à Battle-Scarred. Le tri se fait côté serveur, pour que la pagination reste stable d'une page à l'autre."
   },
   {
-    title: "Sourcing des images",
-    problem: "L'API de Skinport ne fournit pas d'image.",
+    title: 'Fautes de frappe dans la recherche',
+    problem:
+      "La similarité par trigrammes (pg_trgm) tolère mal les inversions de lettres dans les mots courts : \"glvoes\" ressemble plus à \"Glitter\" qu'à \"Gloves\", et abaisser le seuil ne fait qu'ajouter du bruit.",
     solution:
-      "Intégration d'un dataset communautaire externe, avec deux stratégies de correspondance : exacte quand l'identifiant produit est directement fourni, ou avec normalisation du nom sinon."
+      "Quand une recherche ne donne rien, chaque mot inconnu est corrigé vers le mot le plus proche du vocabulaire du catalogue (distance d'édition où une inversion compte pour une seule faute, avec abandon anticipé du calcul). Ce vocabulaire est gardé en mémoire, puisqu'il ne change qu'à l'ingestion. La requête corrigée est proposée en tête des suggestions, en une dizaine de millisecondes, sans extension ni migration supplémentaire."
+  },
+  {
+    title: 'Sourcing des images et des raretés',
+    problem: "L'API de Skinport ne fournit ni image ni rareté.",
+    solution:
+      "Intégration d'un dataset communautaire externe, avec deux stratégies de correspondance : exacte quand l'identifiant produit est directement fourni, ou avec normalisation du nom sinon. La rareté vient du même dataset. Elle est normalisée à partir de la couleur officielle du tier plutôt que de son nom, puisqu'un sticker \"High Grade\" et une arme \"Mil-Spec\" partagent le même bleu. Elle colore le liseré de chaque carte, et le nom du tier reste lisible par les lecteurs d'écran."
+  },
+  {
+    title: "Le réveil du serveur en hébergement gratuit",
+    problem:
+      "Le backend en tier gratuit se met en veille après 15 minutes sans visite : le premier chargement peut prendre 30 à 60 secondes. Avec de simples squelettes de chargement, l'attente ressemble à une panne.",
+    solution:
+      "Au-delà de 3 secondes d'attente, l'accueil explique le réveil du serveur avec un compteur de secondes et propose de lire cette page en attendant. Chaque requête a un délai maximal de 90 secondes, avec un message dédié. Un échec affiche une erreur avec un bouton pour réessayer, jamais un faux état vide."
+  },
+  {
+    title: 'Des données qui peuvent vieillir sans prévenir',
+    problem:
+      "Si une ingestion quotidienne échoue, le site continue d'afficher les derniers prix connus. \"Mis à jour chaque jour\" deviendrait alors une promesse fausse.",
+    solution:
+      "L'accueil affiche la date réelle du dernier relevé et le nombre d'items cotés. Au-delà d'un jour de retard, la ligne l'indique explicitement (\"collecte en retard de N jours\"). Le classement des variations annonce aussi les deux dates qu'il compare, plutôt qu'un vague \"du jour\"."
   }
 ];
 
@@ -67,6 +88,7 @@ const SECURITY = [
   'Validation des entrées (format email, bornes numériques, longueur des mots de passe)',
   'Mots de passe hashés avec bcrypt',
   'Requêtes SQL systématiquement paramétrées',
+  'Recherche bornée (longueur et nombre de mots) et jokers % et _ échappés dans les ILIKE : une saisie comme "__" ne peut pas renvoyer tout le catalogue',
   'Conteneurs applicatifs exécutés en utilisateur non-root',
   'Outil d\'administration de la base isolé derrière un profil Docker dédié au développement, jamais actif en production',
   'Routes de déclenchement d\'ingestion (utilisées en production) protégées par un secret dédié, comparé de façon résistante aux attaques par mesure de temps'
@@ -103,6 +125,11 @@ export default function About() {
           Le prix affiché sur le graphique et utilisé pour les alertes (prix minimum, quantité d'offres) est
           calculé de la même façon pour tous les ~25 000 skins du catalogue, suivis ou non — une seule requête
           quotidienne à l'API suffit à couvrir l'ensemble.
+        </p>
+        <p className="text-sm text-muted mb-3">
+          Ce même historique alimente les mini-courbes de l'accueil, récupérées en une seule requête pour les items
+          classés. Un jour à moins de 5 offres coupe la courbe au lieu d'y placer un point trompeur, et l'axe suit
+          les vraies dates, si bien qu'un trou de collecte reste visible au lieu d'être gommé.
         </p>
         <p className="text-sm text-muted">
           Une donnée plus détaillée (moyenne des ventes réelles, volume de ventes) reste calculée séparément pour
@@ -158,7 +185,8 @@ export default function About() {
         <p className="text-sm text-muted">
           Le schéma de base de données est entièrement scripté dans un fichier d'initialisation unique, exécuté
           automatiquement à la création du volume — aucune étape manuelle nécessaire pour démarrer l'environnement
-          depuis zéro.
+          depuis zéro. Une base existante évolue par des migrations idempotentes, appliquées avant le déploiement
+          du code qui en dépend.
         </p>
       </section>
 
@@ -190,8 +218,9 @@ export default function About() {
             <p className="text-sm text-muted">
               Un service "toujours actif" dédié à la planification (comme en développement) implique un coût
               fixe. À la place, deux routes protégées par un secret déclenchent les ingestions à distance,
-              appelées chaque jour par un workflow GitHub Actions planifié — gratuit, sans service supplémentaire
-              à faire tourner en continu.
+              appelées chaque jour par deux workflows GitHub Actions planifiés (le catalogue à 3h UTC, puis
+              l'historique détaillé et les alertes à 4h UTC) — gratuit, sans service supplémentaire à faire tourner
+              en continu. Une troisième route, pour les images et les raretés, se lance à la demande.
             </p>
           </div>
         </div>
