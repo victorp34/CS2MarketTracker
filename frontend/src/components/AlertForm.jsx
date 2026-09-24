@@ -52,14 +52,14 @@ export default function AlertForm({ marketHashName, onCreated }) {
       </div>
 
       <button type="submit" disabled={submitting} className="btn-primary w-full">
-        {submitting ? 'Création...' : 'Créer l\'alerte'}
+        {submitting ? 'Création…' : 'Créer l\'alerte'}
       </button>
 
       {status === 'success' && (
         <p className="text-sm text-gold mt-3">Alerte créée avec succès.</p>
       )}
       {status === 'error' && (
-        <p className="text-sm text-covert mt-3">Erreur : {errorMsg}</p>
+        <p className="text-sm text-covert-text mt-3">Erreur : {errorMsg}</p>
       )}
     </form>
   );

@@ -36,8 +36,8 @@ export default function Alerts() {
     });
   }, [alerts, query]);
 
-  if (loading) return <p className="text-muted">Chargement...</p>;
-  if (error) return <p className="text-covert">Erreur : {error}</p>;
+  if (loading) return <p className="text-muted">Chargement…</p>;
+  if (error) return <p className="text-covert-text">Erreur : {error}</p>;
 
   return (
     <div>
@@ -47,7 +47,7 @@ export default function Alerts() {
       {alerts.length > 0 && (
         <input
           type="text"
-          placeholder="Filtrer mes alertes par nom de skin..."
+          placeholder="Filtrer mes alertes par nom de skin…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="input-field w-full mb-6"
@@ -57,7 +57,7 @@ export default function Alerts() {
       {alerts.length === 0 ? (
         <p className="text-muted">
           Aucune alerte pour l'instant.{' '}
-          <Link to="/" className="text-covert hover:underline">Parcours les skins</Link> pour en créer une.
+          <Link to="/" className="text-covert-text hover:underline">Parcours les skins</Link> pour en créer une.
         </p>
       ) : filteredAlerts.length === 0 ? (
         <p className="text-muted">Aucune alerte ne correspond à "{query}".</p>

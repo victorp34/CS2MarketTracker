@@ -8,6 +8,11 @@ CREATE TABLE skins (
     item_page TEXT,
     market_page TEXT,
     image_url TEXT,
+    -- Rareté issue du dataset CSGO-API (ingest-images.js) : tier normalisé
+    -- (consumer, industrial, milspec, restricted, classified, covert, contraband)
+    -- et nom officiel anglais du tier (ex. "Remarkable" pour un sticker)
+    rarity TEXT,
+    rarity_name TEXT,
     added_at TIMESTAMP NOT NULL DEFAULT now()
 );
 

@@ -1,0 +1,422 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-24T16:20:04.450Z",
+  "title": "Design System: CS2 Market Tracker",
+  "extensions": {
+    "colorMeta": {
+      "covert-red": {
+        "role": "primary",
+        "displayName": "Rouge Covert",
+        "canonical": "#e0473e",
+        "tonalRamp": [
+          "#2f0000",
+          "#570000",
+          "#820000",
+          "#af1014",
+          "#db423a",
+          "#ff6c5f",
+          "#ff9d8e",
+          "#ffc8b9"
+        ]
+      },
+      "contraband-gold": {
+        "role": "secondary",
+        "displayName": "Or Contrebande",
+        "canonical": "#d4af37",
+        "tonalRamp": [
+          "#1a0500",
+          "#381e00",
+          "#593a00",
+          "#7b5800",
+          "#9f7b00",
+          "#c5a021",
+          "#e9c763",
+          "#ffec96"
+        ]
+      },
+      "gain-green": {
+        "role": "tertiary",
+        "displayName": "Vert Hausse (dette)",
+        "canonical": "#4ade80",
+        "tonalRamp": [
+          "#001600",
+          "#003400",
+          "#005402",
+          "#00771e",
+          "#009d43",
+          "#26c368",
+          "#70e895",
+          "#a4ffc0"
+        ]
+      },
+      "graphite-base": {
+        "role": "neutral",
+        "displayName": "Graphite Fond",
+        "canonical": "#14161a",
+        "tonalRamp": [
+          "#090b0f",
+          "#222428",
+          "#3d4044",
+          "#5b5e63",
+          "#7e8085",
+          "#a2a5aa",
+          "#c8cbd0",
+          "#ebeef4"
+        ]
+      },
+      "graphite-surface": {
+        "role": "neutral",
+        "displayName": "Graphite Surface",
+        "canonical": "#1c1f26",
+        "tonalRamp": [
+          "#080b11",
+          "#21242b",
+          "#3c4047",
+          "#5a5e66",
+          "#7c8089",
+          "#a0a5ae",
+          "#c6cad4",
+          "#eaeef8"
+        ]
+      },
+      "graphite-hover": {
+        "role": "neutral",
+        "displayName": "Graphite Survol",
+        "canonical": "#242832",
+        "tonalRamp": [
+          "#080b13",
+          "#20242e",
+          "#3b404a",
+          "#595d69",
+          "#7b808c",
+          "#9fa4b1",
+          "#c5cad8",
+          "#e9eefc"
+        ]
+      },
+      "steel-border": {
+        "role": "neutral",
+        "displayName": "Acier Bordure",
+        "canonical": "#2a2e38",
+        "tonalRamp": [
+          "#080b13",
+          "#20242d",
+          "#3b404a",
+          "#595d69",
+          "#7b808c",
+          "#9fa4b1",
+          "#c5cad7",
+          "#e9eefc"
+        ]
+      },
+      "ash-muted": {
+        "role": "neutral",
+        "displayName": "Cendre",
+        "canonical": "#8a8f9c",
+        "tonalRamp": [
+          "#080b14",
+          "#20242e",
+          "#3b3f4b",
+          "#595d69",
+          "#7b808d",
+          "#9fa4b2",
+          "#c5cad8",
+          "#e9eefd"
+        ]
+      },
+      "bone-white": {
+        "role": "neutral",
+        "displayName": "Blanc Os",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "rarity-consumer": {
+        "role": "data",
+        "displayName": "Rareté Consommateur",
+        "canonical": "#b0c3d9"
+      },
+      "rarity-industrial": {
+        "role": "data",
+        "displayName": "Rareté Industriel",
+        "canonical": "#5e98d9"
+      },
+      "rarity-milspec": {
+        "role": "data",
+        "displayName": "Rareté Militaire",
+        "canonical": "#4b69ff"
+      },
+      "rarity-restricted": {
+        "role": "data",
+        "displayName": "Rareté Prohibé",
+        "canonical": "#8847ff"
+      },
+      "rarity-classified": {
+        "role": "data",
+        "displayName": "Rareté Classifié",
+        "canonical": "#d32ce6"
+      },
+      "rarity-covert": {
+        "role": "data",
+        "displayName": "Rareté Secret",
+        "canonical": "#eb4b4b"
+      },
+      "rarity-contraband": {
+        "role": "data",
+        "displayName": "Rareté Contrebande",
+        "canonical": "#e4ae39"
+      },
+      "rarity-unknown": {
+        "role": "data",
+        "displayName": "Rareté Non classé",
+        "canonical": "#3a3f4b"
+      },
+      "covert-red-text": {
+        "role": "primary",
+        "displayName": "Rouge Covert Texte",
+        "canonical": "#ec6259"
+      },
+      "covert-red-fill": {
+        "role": "primary",
+        "displayName": "Rouge Covert Aplat",
+        "canonical": "#c83a31"
+      },
+      "covert-red-fill-hover": {
+        "role": "primary",
+        "displayName": "Rouge Covert Aplat (survol)",
+        "canonical": "#b8352d"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Titre de page unique (nom du skin, « Skins »)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Titres de section (page À propos, formulaires)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Nom d'item dans les cartes, titres de défi."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions et texte explicatif, en Cendre quand secondaire."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "En-têtes de liste, badges, boutons : capitales espacées."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Tout prix, pourcentage, seuil ou plage de marché."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Toasts d'alerte uniquement ; jamais sur un élément dans le flux."
+      }
+    ],
+    "motion": [
+      {
+        "name": "color-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Transitions de couleur au survol (cartes, boutons, liens)."
+      },
+      {
+        "name": "switch-slide",
+        "value": "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Glissement de la pastille de l'interrupteur."
+      },
+      {
+        "name": "skeleton-pulse",
+        "value": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "purpose": "Squelettes de chargement."
+      },
+      {
+        "name": "toast-in",
+        "value": "220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 0→1 + translateY(-8px→0)",
+        "purpose": "Entrée des toasts d'alerte ; neutralisée par prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "focusRing": {
+      "value": "outline: 2px solid #ec6259; outline-offset: 2px",
+      "purpose": "Focus clavier global (:focus-visible) ; les champs gardent bordure rouge + anneau 0 0 0 2px rgba(224,71,62,0.5)."
+    },
+    "signatureGradient": {
+      "value": "linear-gradient(180deg, #d4af37 0%, #e0473e 100%)",
+      "purpose": "Liseré de marque des cartes SANS item (page À propos). Les cartes d'item utilisent la couleur de leur tier via --rarity-edge."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Action principale (Connexion, Créer l'alerte) : fond Rouge Covert plein.",
+      "html": "<button class=\"ds-btn-primary\">Créer l'alerte</button>",
+      "css": ".ds-btn-primary { background: #c83a31; color: #fff; font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 0.875rem; line-height: 1.25rem; text-transform: uppercase; letter-spacing: 0.025em; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: #b8352d; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(224,71,62,0.5); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Action secondaire (Déconnexion, pagination, Charger plus).",
+      "html": "<button class=\"ds-btn-secondary\">Suivant →</button>",
+      "css": ".ds-btn-secondary { background: #1c1f26; color: #fff; font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 0.875rem; line-height: 1.25rem; text-transform: uppercase; letter-spacing: 0.025em; padding: 8px 16px; border: 1px solid #2a2e38; border-radius: 4px; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-secondary:hover { background: #242832; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(224,71,62,0.5); } .ds-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Champ de saisie plus sombre que la surface, focus rouge.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Rechercher un skin (ex: AK-47 Redline)...\" />",
+      "css": ".ds-input { background: #14161a; color: #fff; font-family: Inter, sans-serif; font-size: 1rem; padding: 8px 12px; border: 1px solid #2a2e38; border-radius: 4px; width: 100%; } .ds-input::placeholder { color: #8a8f9c; } .ds-input:focus { outline: none; border-color: #e0473e; box-shadow: 0 0 0 2px rgba(224,71,62,0.5); }"
+    },
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "navbar",
+      "description": "Barre surface avec logo CS2/MARKET et liens en Cendre.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-logo\" href=\"#\">CS2<span>MARKET</span></a><div class=\"ds-nav-links\"><a href=\"#\">À propos</a><a href=\"#\">Mes alertes</a><button class=\"ds-nav-btn\">Connexion</button></div></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; background: #1c1f26; border-bottom: 1px solid #2a2e38; padding: 16px 24px; } .ds-nav-logo { font-family: Rajdhani, sans-serif; font-weight: 700; font-size: 1.25rem; letter-spacing: 0.025em; color: #fff; text-decoration: none; } .ds-nav-logo span { color: #e0473e; } .ds-nav-links { display: flex; align-items: center; gap: 16px; } .ds-nav-links a { font-family: Inter, sans-serif; font-size: 0.875rem; color: #8a8f9c; text-decoration: none; transition: color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-nav-links a:hover { color: #fff; } .ds-nav-btn { background: #c83a31; color: #fff; font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.025em; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; } .ds-nav-btn:hover { background: #b8352d; }"
+    },
+    {
+      "name": "Status Badges",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Trois états d'alerte : Déclenchée, Active, En pause.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-badge-triggered\">Déclenchée</span><span class=\"ds-badge ds-badge-active\">Active</span><span class=\"ds-badge ds-badge-paused\">En pause</span></div>",
+      "css": ".ds-badges { display: flex; gap: 8px; } .ds-badge { font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 0.75rem; line-height: 1rem; text-transform: uppercase; letter-spacing: 0.025em; padding: 2px 8px; border-radius: 9999px; } .ds-badge-triggered { background: rgba(224,71,62,0.2); color: #e0473e; } .ds-badge-active { background: rgba(20,83,45,0.4); color: #4ade80; } .ds-badge-paused { background: #242832; color: #8a8f9c; }"
+    },
+    {
+      "name": "Rarity Card (mover row)",
+      "kind": "card",
+      "refersTo": "rarity-card",
+      "description": "Signature : carte surface dont le liseré prend la couleur officielle du tier de l'item (ici Classifié).",
+      "html": "<a class=\"ds-rarity-card\" style=\"--rarity-edge: #d32ce6\" title=\"Rareté : Classifié\" href=\"#\"><div class=\"ds-thumb\">AK</div><div class=\"ds-card-body\"><span class=\"ds-card-name\">AK-47 | Redline (Field-Tested)</span><span class=\"ds-card-price\">12.34 € (min)</span></div><div class=\"ds-card-change\"><span class=\"ds-change-down\">-8.2%</span><span class=\"ds-card-since\">depuis le 23 sept.</span></div></a>",
+      "css": ".ds-rarity-card { position: relative; display: flex; align-items: center; gap: 16px; background: #1c1f26; border: 1px solid #2a2e38; border-radius: 8px; padding: 16px 16px 16px 20px; overflow: hidden; color: #fff; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-rarity-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--rarity-edge, linear-gradient(180deg, #d4af37 0%, #e0473e 100%)); } .ds-rarity-card:hover { background: #242832; } .ds-rarity-card:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(224,71,62,0.5); } .ds-thumb { width: 56px; height: 56px; flex-shrink: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: Rajdhani, sans-serif; font-weight: 700; color: #8a8f9c; background: linear-gradient(135deg, #1c1f26 0%, #2a2e38 100%); } .ds-card-body { min-width: 0; flex: 1; } .ds-card-name { display: block; font-family: Rajdhani, sans-serif; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-card-price { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: #8a8f9c; } .ds-card-change { text-align: right; flex-shrink: 0; } .ds-change-down { display: block; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.875rem; color: #ec6259; } .ds-card-since { font-family: Inter, sans-serif; font-size: 0.75rem; color: #8a8f9c; }"
+    },
+    {
+      "name": "Switch",
+      "kind": "custom",
+      "refersTo": "switch",
+      "description": "Interrupteur d'activation d'alerte : rouge quand actif.",
+      "html": "<button class=\"ds-switch\" role=\"switch\" aria-checked=\"true\"><span></span></button>",
+      "css": ".ds-switch { position: relative; width: 40px; height: 24px; border-radius: 9999px; background: #e0473e; border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-switch span { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 9999px; background: #fff; transform: translateX(16px); transition: transform 150ms cubic-bezier(0.4,0,0.2,1); } .ds-switch[aria-checked='false'] { background: #242832; border: 1px solid #2a2e38; } .ds-switch[aria-checked='false'] span { transform: translateX(0); } .ds-switch:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(224,71,62,0.5); }"
+    },
+    {
+      "name": "Section Label",
+      "kind": "custom",
+      "refersTo": "label",
+      "description": "En-tête de liste en capitales Rajdhani, coloré selon le sens (hausse/baisse) ou neutre.",
+      "html": "<p class=\"ds-section-label\">Plus fortes baisses</p>",
+      "css": ".ds-section-label { font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 0.75rem; line-height: 1rem; text-transform: uppercase; letter-spacing: 0.025em; color: #ec6259; margin: 0; }"
+    },
+    {
+      "name": "Rarity Badge",
+      "kind": "chip",
+      "refersTo": "rarity-badge",
+      "description": "Rareté sur la fiche d'item : pastille de couleur du tier, nom en blanc (jamais dans la couleur du tier).",
+      "html": "<p class=\"ds-rarity\"><span class=\"ds-rarity-dot\" style=\"background:#8847ff\"></span>Rareté : <strong>Prohibé</strong></p>",
+      "css": ".ds-rarity { display: flex; align-items: center; gap: 8px; font-family: Inter, sans-serif; font-size: 0.875rem; color: #8a8f9c; margin: 0; } .ds-rarity-dot { width: 10px; height: 10px; border-radius: 9999px; flex-shrink: 0; } .ds-rarity strong { color: #fff; font-weight: 400; }"
+    },
+    {
+      "name": "Search Chip",
+      "kind": "chip",
+      "refersTo": "search-chip",
+      "description": "Pastille qui relance une recherche : exemples sous le champ, suggestions « Vouliez-vous dire ».",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\">AK-47 Redline</button><button class=\"ds-chip\">Karambit</button><button class=\"ds-chip\">Sport Gloves</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { min-height: 36px; padding: 0 12px; border-radius: 9999px; border: 1px solid #2a2e38; background: #1c1f26; color: #fff; font-family: Inter, sans-serif; font-size: 0.875rem; white-space: nowrap; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-chip:hover { background: #242832; } .ds-chip:focus-visible { outline: 2px solid #ec6259; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le Relevé de marché",
+    "overview": "Le système se lit comme un relevé : un fond graphite presque noir, des chiffres en police mono, et très peu de couleur. Les deux couleurs d'accent viennent directement des tiers de rareté de CS2 (rouge Covert, or Contrebande). Elles ne servent pas à décorer : chacune signale quelque chose, qu'il s'agisse d'une baisse, d'une action, d'un prix minimum ou d'une solution. Un joueur les reconnaît sans explication. Quelqu'un qui ne joue pas voit simplement un outil de données sobre qui assume ses choix.\n\nLa densité reste modérée. Une seule colonne centrée, des listes de cartes empilées et des sections annoncées par de petits labels en capitales. Les titres en Rajdhani, condensée et anguleuse, apportent le côté « jeu ». Inter porte la lecture et JetBrains Mono porte chaque prix, pourcentage ou plage. L'interface est plate et la profondeur passe par trois paliers de gris. Le seul élément récurrent est le liseré sur le bord gauche des cartes. Sur une carte d'item, il porte la vraie rareté de l'item, dans la couleur officielle de son tier : un joueur lit la liste comme son inventaire. Le dégradé or → rouge ne sert plus que de sceau de marque sur les cartes sans item.\n\nLes composants sont nets et tactiques : petits rayons, labels de bouton en capitales espacées, contrastes francs, et des transitions limitées aux couleurs.",
+    "keyCharacteristics": [
+      "Fond graphite en trois paliers tonals, sans ombres portées",
+      "Deux accents issus des raretés CS2, employés comme signaux",
+      "Tout chiffre (prix, %, date courte, plage) en JetBrains Mono",
+      "Titres et labels en Rajdhani ; labels et boutons en capitales espacées",
+      "Liseré de rareté : la couleur officielle du tier de l'item, le dégradé or → rouge en repli de marque",
+      "Une colonne centrée (64rem max), contenu empilé"
+    ],
+    "rules": [
+      {
+        "name": "La règle du signal de rareté",
+        "body": "Le rouge et l'or ne remplissent jamais de grandes surfaces. Ils colorent un chiffre, un label, un trait ou un bouton, et c'est leur rareté qui leur donne du sens. Seul le bouton primaire a un fond rouge plein.",
+        "section": "colors"
+      },
+      {
+        "name": "La règle des deux lectures",
+        "body": "Le rouge veut toujours dire « action ou baisse/alerte », l'or veut toujours dire « valeur ou confirmation ». Une nouvelle surface ne réaffecte pas ces rôles.",
+        "section": "colors"
+      },
+      {
+        "name": "La règle du chiffre en mono",
+        "body": "Tout nombre qui représente une donnée de marché (prix, pourcentage, seuil, plage) est en JetBrains Mono. Un nombre dans une phrase explicative reste dans la police du texte.",
+        "section": "typography"
+      },
+      {
+        "name": "La règle des capitales tactiques",
+        "body": "Les capitales espacées sont réservées aux labels Rajdhani (boutons, badges, en-têtes de liste). On ne les utilise ni dans le corps de texte ni dans les titres.",
+        "section": "typography"
+      },
+      {
+        "name": "La règle plat par défaut",
+        "body": "Les éléments dans le flux n'ont jamais d'ombre. Pour signaler un état (survol, actif), on passe au palier tonal suivant.",
+        "section": "elevation"
+      },
+      {
+        "name": "La règle de l'échelle réservée",
+        "section": "colors",
+        "body": "Les couleurs de rareté ne servent qu'à dire la rareté d'un item. Elles ne deviennent jamais des accents d'interface, et le Rouge Covert de marque (#e0473e) reste distinct du rouge de tier Secret (#eb4b4b). Une rareté n'est jamais transmise par la seule couleur : son nom est présent en texte, en info-bulle ou en texte pour les lecteurs d'écran."
+      },
+      {
+        "name": "La règle du rouge lisible",
+        "section": "colors",
+        "body": "Trait, interrupteur ou grand titre gras (logo) : Rouge Covert. Texte rouge sous 18px : Rouge Covert Texte. Aplat portant du texte blanc : Rouge Covert Aplat. Ne jamais intervertir ces rôles."
+      }
+    ],
+    "dos": [
+      "Do réserver le Rouge Covert aux actions, baisses, alertes et erreurs, et l'Or Contrebande à la valeur, à la confirmation et aux liens d'offre.",
+      "Do mettre tout prix, pourcentage, seuil et plage en JetBrains Mono, avec « € » après le nombre et deux décimales.",
+      "Do présenter chaque élément de liste dans une carte-liseré, avec la vignette à gauche et la donnée alignée à droite. Une carte d'item porte toujours la classe de rareté de l'item.",
+      "Do passer au palier tonal suivant pour exprimer le survol ou la profondeur.",
+      "Do annoncer chaque liste par un label Rajdhani en capitales 0.75rem.",
+      "Do donner à chaque squelette la forme exacte du contenu qu'il remplace.",
+      "Do accompagner chaque couleur de rareté du nom du tier (texte visible, info-bulle ou texte pour lecteurs d'écran)."
+    ],
+    "donts": [
+      "Don't remplir une grande surface de rouge ou d'or : seul le bouton primaire a un fond d'accent plein.",
+      "Don't ajouter d'ombre portée à un élément dans le flux. L'ombre est réservée aux éléments flottants.",
+      "Don't étendre l'usage du Vert Hausse (#4ade80) à de nouvelles surfaces tant que la dette n'est pas tranchée.",
+      "Don't coder les couleurs en dur dans les composants (le graphique de prix le fait encore) : passer par les tokens.",
+      "Don't utiliser de logo, marque ou visuel Skinport ou Valve qui suggérerait une affiliation.",
+      "Don't écrire de capitales espacées en dehors des labels Rajdhani.",
+      "Don't utiliser une couleur de rareté pour autre chose qu'une rareté, ni écrire du texte dans une couleur de tier.",
+      "Don't mettre le dégradé de marque sur une carte d'item : il ferait lire une rareté qui n'existe pas."
+    ]
+  }
+}

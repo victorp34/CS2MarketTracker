@@ -27,12 +27,22 @@ router.get('/followed-skins', async (req, res) => {
     // On demande un résultat de plus que la page pour savoir s'il y a une page
     // suivante, sans COUNT(*) séparé.
     const { rows } = await pool.query(
-      `SELECT DISTINCT s.id, s.market_hash_name, s.image_url
-       FROM skins s
-       JOIN alerts a ON a.skin_id = s.id
-       WHERE a.user_id = $1
-       ORDER BY s.market_hash_name
-       OFFSET $2 LIMIT $3`,
+      `SELECT page.*, lp.min_price
+       FROM (
+         SELECT DISTINCT s.id, s.market_hash_name, s.image_url, s.rarity, s.rarity_name
+         FROM skins s
+         JOIN alerts a ON a.skin_id = s.id
+         WHERE a.user_id = $1
+         ORDER BY s.market_hash_name
+         OFFSET $2 LIMIT $3
+       ) page
+       LEFT JOIN LATERAL (
+         SELECT min_price FROM price_daily pd
+         WHERE pd.skin_id = page.id
+         ORDER BY pd.recorded_date DESC
+         LIMIT 1
+       ) lp ON true
+       ORDER BY page.market_hash_name`,
       [req.userId, offset, limit + 1]
     );
 
@@ -87,7 +97,7 @@ router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT a.id, a.target_price, a.direction, a.is_active, a.triggered, a.triggered_unseen, a.created_at,
-              s.id AS skin_id, s.market_hash_name
+              s.id AS skin_id, s.market_hash_name, s.rarity, s.rarity_name
        FROM alerts a
        JOIN skins s ON s.id = a.skin_id
        WHERE a.user_id = $1

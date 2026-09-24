@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
+import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AlertToast from './components/AlertToast.jsx';
 import SkinsList from './pages/SkinsList.jsx';
@@ -35,10 +36,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-base">
+    <div className="min-h-screen bg-base flex flex-col">
       <Navbar />
       <AlertToast notifications={notifications} onDismiss={handleDismiss} />
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-10">
         <Routes>
           <Route path="/" element={<SkinsList />} />
           <Route path="/skins/:id" element={<SkinDetail />} />
@@ -54,6 +55,7 @@ export default function App() {
           />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

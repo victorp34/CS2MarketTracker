@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import Switch from './Switch.jsx';
+import { rarityEdgeClass, rarityA11yProps } from '../rarity.js';
 
 export default function AlertCard({ alert, onUpdated, onDeleted }) {
   const [editing, setEditing] = useState(false);
@@ -52,19 +53,19 @@ export default function AlertCard({ alert, onUpdated, onDeleted }) {
   // Trois états distincts : déclenchée (prioritaire), active, ou mise en pause par l'utilisateur
   const statusLabel = alert.triggered ? 'Déclenchée' : alert.is_active ? 'Active' : 'En pause';
   const statusStyle = alert.triggered
-    ? 'bg-covert/20 text-covert'
+    ? 'bg-covert/20 text-covert-text'
     : alert.is_active
     ? 'bg-green-900/40 text-green-400'
     : 'bg-surfaceHover text-muted';
 
   return (
-    <div className="rarity-card">
+    <div className={`rarity-card ${rarityEdgeClass(alert.rarity)}`} {...rarityA11yProps(alert)}>
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <Link
               to={`/skins/${alert.skin_id}`}
-              className="font-display font-semibold hover:text-covert transition-colors truncate"
+              className="font-display font-semibold hover:text-covert-text transition-colors truncate"
             >
               {alert.market_hash_name}
             </Link>
@@ -111,7 +112,7 @@ export default function AlertCard({ alert, onUpdated, onDeleted }) {
               <button onClick={() => setEditing(true)} className="text-sm text-muted hover:text-white transition-colors">
                 Modifier
               </button>
-              <button onClick={handleDelete} className="text-sm text-muted hover:text-covert transition-colors">
+              <button onClick={handleDelete} className="text-sm text-muted hover:text-covert-text transition-colors">
                 Supprimer
               </button>
             </>
@@ -119,7 +120,7 @@ export default function AlertCard({ alert, onUpdated, onDeleted }) {
         </div>
       </div>
 
-      {error && <p className="text-sm text-covert mt-2">{error}</p>}
+      {error && <p className="text-sm text-covert-text mt-2">{error}</p>}
     </div>
   );
 }

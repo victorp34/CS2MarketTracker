@@ -47,6 +47,21 @@ docker compose exec backend node ingest.js             # historique détaillé +
 docker compose exec backend node ingest-images.js      # association des images
 ```
 
+## Migrations de schéma (base existante)
+
+`init.sql` ne s'exécute que sur une base neuve. Pour une base existante (Docker local déjà initialisé, Neon en production), appliquer les fichiers de `migrations/` dans l'ordre. Ils sont idempotents.
+
+⚠️ Appliquer la migration **avant** de déployer le backend qui lit les nouvelles colonnes, sinon les routes concernées renvoient une erreur 500.
+
+```powershell
+# Local (Docker)
+Get-Content migrations/2026-09-24-skins-rarity.sql | docker exec -i cs2-market-db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+
+# Production (Neon) : coller le contenu du fichier dans le SQL Editor de console.neon.tech
+```
+
+`2026-09-24-skins-rarity.sql` ajoute `skins.rarity` et `skins.rarity_name`. Après l'avoir appliquée, lancer l'ingestion des images (`run-images`) pour les renseigner. Tant qu'elle n'a pas tourné, les cartes affichent le liseré gris « non classé ».
+
 ## Ingestion manuelle en PRODUCTION
 
 Nécessite `ADMIN_SECRET` (valeur définie dans les variables d'environnement du backend sur Render).

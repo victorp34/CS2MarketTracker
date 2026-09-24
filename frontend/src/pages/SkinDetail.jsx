@@ -6,6 +6,7 @@ import { useAuth } from '../AuthContext.jsx';
 import AlertForm from '../components/AlertForm.jsx';
 import AlertCard from '../components/AlertCard.jsx';
 import SkinImage from '../components/SkinImage.jsx';
+import { rarityDotClass, rarityLabel } from '../rarity.js';
 
 const LINES = [
   { dataKey: 'min', name: 'Prix min (€)', color: '#e0473e', axis: 'price' },
@@ -86,12 +87,19 @@ export default function SkinDetail() {
       </div>
     );
   }
-  if (error) return <p className="text-covert">Erreur : {error}</p>;
+  if (error) return <p className="text-covert-text">Erreur : {error}</p>;
   if (!skin) return <p className="text-muted">Skin introuvable.</p>;
 
   return (
     <div>
       <h1 className="font-display font-bold text-3xl mb-1">{skin.market_hash_name}</h1>
+      {rarityLabel(skin) && (
+        // Pastille colorée + nom en blanc : les couleurs de tier n'atteignent pas 4,5:1 en petit texte
+        <p className="flex items-center gap-2 text-sm text-muted mb-2">
+          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${rarityDotClass(skin.rarity)}`} aria-hidden="true" />
+          Rareté : <span className="text-white">{rarityLabel(skin)}</span>
+        </p>
+      )}
       <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
         <p className="text-muted">Historique sur les {history.length} derniers jours suivis (rétention 90 jours). Clique sur la légende pour afficher/masquer une courbe.</p>
         <div className="flex items-center gap-4 shrink-0">
@@ -165,7 +173,7 @@ export default function SkinDetail() {
         </div>
       ) : (
         <p className="text-muted">
-          <a href="/login" className="text-covert hover:underline">Connecte-toi</a> pour créer une alerte de prix sur ce skin.
+          <a href="/login" className="text-covert-text hover:underline">Connecte-toi</a> pour créer une alerte de prix sur ce skin.
         </p>
       )}
     </div>

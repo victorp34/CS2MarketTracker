@@ -73,10 +73,10 @@ export default function Login() {
         />
 
         <button type="submit" disabled={submitting} className="btn-primary">
-          {submitting ? 'Chargement...' : mode === 'login' ? 'Se connecter' : "S'inscrire"}
+          {submitting ? 'Chargement…' : mode === 'login' ? 'Se connecter' : "S'inscrire"}
         </button>
 
-        {error && <p className="text-sm text-covert">{error}</p>}
+        {error && <p className="text-sm text-covert-text">{error}</p>}
       </form>
 
       <button

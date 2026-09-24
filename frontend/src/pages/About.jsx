@@ -36,7 +36,7 @@ const CHALLENGES = [
     problem:
       "Le prix minimum d'un item peut être faussé par une seule annonce isolée très en dessous du marché — un skin passant de 100€ à 2€ puis revenant à 100€ ne représente aucune vraie tendance. Premier correctif : utiliser le prix médian plutôt que le minimum. Mais un second cas est apparu sur des objets très bon marché (un sticker passant de 0,11€ à 0,50€ affichait +354%, un chiffre réel mais sans aucune portée économique).",
     solution:
-      "Le calcul final combine un plancher de liquidité (au moins 10 offres actives aux deux instants comparés) et un plancher de prix absolu (1€ minimum des deux côtés), sur le prix minimum plutôt que la médiane — cette dernière n'était en fait pas le vrai problème, tous les prix bas souffrent du même effet de pourcentage disproportionné."
+      "Le calcul final combine un plancher de liquidité (au moins 10 offres actives aux deux instants comparés) et un plancher de prix absolu (5€ minimum des deux côtés ; d'abord fixé à 1€, il laissait encore des stickers passant de 1€ à 4€ dominer le classement à +250%), sur le prix minimum plutôt que la médiane — cette dernière n'était en fait pas le vrai problème, tous les prix bas souffrent du même effet de pourcentage disproportionné."
   },
   {
     title: 'Quel prix utiliser pour déclencher une alerte ?',
@@ -119,7 +119,7 @@ export default function About() {
             <div key={c.title} className="rarity-card">
               <span className="font-display font-semibold block mb-2">{c.title}</span>
               <p className="text-sm text-muted mb-2">
-                <span className="text-covert font-semibold">Problème — </span>
+                <span className="text-covert-text font-semibold">Problème — </span>
                 {c.problem}
               </p>
               <p className="text-sm text-muted">

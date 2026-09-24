@@ -1,10 +1,11 @@
-export default function SkinImage({ imageUrl, name, size = 'md' }) {
+// decorative : le nom est déjà écrit à côté (lignes de liste), l'image n'a rien à ajouter pour un lecteur d'écran
+export default function SkinImage({ imageUrl, name, size = 'md', decorative = false }) {
   const dimensions = size === 'lg' ? 'w-full h-48' : 'w-14 h-14';
 
   if (imageUrl) {
     return (
       <div className={`${dimensions} shrink-0 bg-base rounded flex items-center justify-center overflow-hidden`}>
-        <img src={imageUrl} alt={name} className="max-w-full max-h-full object-contain" loading="lazy" />
+        <img src={imageUrl} alt={decorative ? '' : name} className="max-w-full max-h-full object-contain" loading="lazy" />
       </div>
     );
   }
@@ -18,8 +19,8 @@ export default function SkinImage({ imageUrl, name, size = 'md' }) {
 
   return (
     <div
-      className={`${dimensions} shrink-0 rounded flex items-center justify-center font-display font-bold text-muted`}
-      style={{ background: 'linear-gradient(135deg, #1c1f26 0%, #2a2e38 100%)' }}
+      className={`${dimensions} shrink-0 rounded flex items-center justify-center font-display font-bold text-muted bg-gradient-to-br from-surface to-border`}
+      aria-hidden={decorative || undefined}
     >
       {initials}
     </div>
